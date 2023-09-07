@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,7 +25,7 @@ public class AddressController {
 	@Autowired
 	private AddressService service;
 	
-	@PostMapping("/find/{id}")
+	@GetMapping("/find/{id}")
 	private ResponseEntity<AddressResponse> find(@PathVariable(name = "id") String id) {
 		return ResponseEntity.ok(service.find(id));
 	}
@@ -34,7 +35,7 @@ public class AddressController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.create(address));
 	}
 	
-	@PostMapping("/update")
+	@PutMapping("/update")
 	private ResponseEntity<AddressResponse> update(@RequestBody AddressRequest address) {
 		return ResponseEntity.ok(service.update(address));
 	}
