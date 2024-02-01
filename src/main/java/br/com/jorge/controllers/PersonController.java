@@ -2,25 +2,23 @@ package br.com.jorge.controllers;
 
 import java.util.List;
 
+import br.com.jorge.config.RateLimiterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import br.com.jorge.dto.request.PersonRequest;
 import br.com.jorge.dto.response.PersonResponse;
 import br.com.jorge.services.PersonService;
+import org.springframework.web.client.HttpClientErrorException;
 
 @RestController
 @RequestMapping("/person")
 public class PersonController {
+
+	@Autowired
+	private RateLimiterService rateLimiterService;
 
 	@Autowired
 	private PersonService service;
@@ -47,7 +45,13 @@ public class PersonController {
 	}
 	
 	@GetMapping("/list")
-	private ResponseEntity<List<PersonResponse>> list() {
-		return ResponseEntity.ok(service.list());
+	private ResponseEntity<Object> list() {
+		if(rateLimiterService.accessApiEndpoint()) {
+			return ResponseEntity.ok(service.list());
+		} else {
+			return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+					.body("Limite TPS atingindo. Tente novamente mais tarde.");
+		}
+
 	}
 }
